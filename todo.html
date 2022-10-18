@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TO-DO-LIST APP</title>
+    <link type="image/png" sizes="32x32" rel="icon" href="./icons8-butterfly-32.png">
+    <style>
+        *{
+            margin:0;padding: 0;
+            background-color: rgb(48, 27, 27);
+            box-sizing: border-box;
+            color: rgb(214, 199, 199);
+        }
+        #container{
+            /* display: block; */
+            text-align: center;
+            margin-top: 5%;
+
+
+        }
+        img{
+            width: 500px; height: 200px;
+            border: 3px solid rgb(194, 111, 111) ;
+            
+        }
+        input{
+           
+            border: 3px solid rgb(194, 111, 111) ;
+            width: 400px;height: 50px;
+            font-size: 18px;
+            
+        }
+        button{
+           display: inline;
+        width:80px;height: 50px;
+        border: 3px solid rgb(194, 111, 111) ;
+        }
+        #textview{
+           margin: auto ;
+            width: 1000px;height: 200px;
+        border: 3px solid rgb(194, 111, 111) ;
+        
+        display:inline-block;
+        flex-direction:column;
+        flex-wrap: wrap;
+        font-size:20px;
+        
+      
+        }
+        p{
+           
+            text-align: left;
+            text-decoration: underline;
+            font-size: 20px;
+            opacity: 0.5;
+        }
+        #editclass, #deleteclass{
+            height: 30px; width:50px;
+            margin: 5px;
+        }
+        
+        .display1{
+            display: flex;
+            justify-content: center;
+           
+        }
+        
+        
+    </style>
+</head>
+<body>
+    
+    <div id="container">
+<h1>To Do List Application</h1>
+        <div id="type-view">
+            <img src="./ana.JPG" alt="no-picture"><br>
+            <input id="AddTask"type="text" placeholder="type to add in list......">
+            <input type="hidden" id="saveindex"></input>
+            <button id="addBtn">Add</button> 
+            <button style="display: none;"id="Savebtn">Save</button> 
+            <button id="deleteBtn">Delete All</button>
+            
+        </div>
+        <div id="textview">
+            <p class="show">Your tasks will be added here!</p>
+        </div>
+    </div>
+    <script>
+        DeleteTasks();
+        showtasks();
+        let AddTaskList = document.getElementById('AddTask');
+        let AddButton = document.getElementById('addBtn');
+
+        AddButton.addEventListener('click', buttonClick);
+
+        function buttonClick(){
+            console.log("clicked")
+            TaskValue = AddTaskList.value;
+            if(TaskValue.trim()!=0){
+            let localItem = localStorage.getItem("local");
+            if(localItem == null){
+                taskobj = [];
+            }else{
+                taskobj = JSON.parse(localItem);
+            }
+            taskobj.push(TaskValue);
+            localStorage.setItem("local", JSON.stringify(taskobj));
+            AddTaskList.value = "";
+        }
+            showtasks();
+            
+        }
+
+        function showtasks(){
+            let localItem = localStorage.getItem("local");
+            if(localItem == null){
+                taskobj = [];
+            }else{
+                taskobj = JSON.parse(localItem);
+            }
+            let lists= ' ';
+            let values = document.getElementById('textview');
+            taskobj.forEach((item, index ) => {
+                lists+= 
+                ` <tr>
+            <th scope="row">${index+1}</th>
+            <td>${item}</td>
+            <td><button type="button"onclick="edittask(${index})" >Edit</button></td>
+            <td><button type="button"onclick="deleteitem(${index})" >Delete</button></td>
+
+        </tr>`
+            // ` <div><p scope="row">${index+1})</p>
+            //         <p id="tasks">${item}</p>
+            //         <span><button type="button" onclick="edittask(${index})" class="text-primary">Edit</button></span>
+            //             <span><button type="button" onclick="deleteitem(${index})">Delete</button></span>
+            //         </div> ` ;
+             });    
+             values.innerHTML = lists;
+        }
+
+           
+        //edittask
+//    ` <tr>
+//             <th scope="row">${index+1}</th>
+//             <td>${item}</td>
+//             <td><button type="button"onclick="edittask(${index})" >Edit</button></td>
+//             <td><button type="button"onclick="deleteitem(${index})" >Delete</button></td>
+
+//         </tr>`
+
+        function edittask(index){
+            let saveindex = document.getElementById('saveindex');
+             let addtaskbtn = document.getElementById('addBtn');
+            let savetasbtn = document.getElementById('Savebtn');
+            saveindex.value = index;
+            let localItem = localStorage.getItem("local");
+            let deletebtn =document.getElementById("deleteBtn");
+            let taskobj = JSON.parse(localItem);
+            AddTaskList.value = taskobj[index];
+            addtaskbtn.style.display = "none";
+            savetasbtn.style.display = "inline";
+            savetasbtn.style.justifyContent = "center";
+            deletebtn.style.display = "inline";
+        }
+
+        //savetask
+        let savetasbtn = document.getElementById('Savebtn');
+        let addtaskbtn = document.getElementById('addBtn');
+
+savetasbtn.addEventListener("click", function(){
+    let localItem = localStorage.getItem("local");
+    let taskobj = JSON.parse(localItem);
+    let saveindex = document.getElementById('saveindex').value;
+    taskobj[saveindex] =AddTaskList.value;
+    savetasbtn.style.display = "none";
+    addtaskbtn.style.display = "inline";
+    localStorage.setItem("local", JSON.stringify(taskobj));
+    AddTaskList.value=" ";
+    showtasks();
+
+})
+//delete single item
+function deleteitem(index){
+    let localItem = localStorage.getItem("local");
+            let taskobj = JSON.parse(localItem); 
+            taskobj.splice(index,1);
+            localStorage.setItem("local", JSON.stringify(taskobj));
+            showtasks();
+}
+//delete all item
+
+let deleteValues = document.getElementById('deleteBtn');
+
+deleteValues.addEventListener('click', DeleteTasks);
+
+function DeleteTasks(){
+    let savetasbtn = document.getElementById('Savebtn');
+    let addtaskbtn = document.getElementById('addBtn');             
+    let localItem = localStorage.getItem("local");
+            let taskobj = JSON.parse(localItem); 
+console.log('deleted all tasks')
+if(taskobj ==null){
+    taskobj= [];
+    
+}
+else{
+    taskobj =JSON.parse(localItem);
+    taskobj= [];
+}
+savetasbtn.style.display = "none";
+addtaskbtn.style.display = "inline";
+localStorage.setItem("local", JSON.stringify(taskobj));
+
+            showtasks();
+}
+let searchtaskitem = document.getElementById("searchtask");
+searchtaskitem.addEventListener("input", function(){
+    let tasklist = document.querySelectorAll("tr")
+    Array.from(tasklist).forEach(function(i){
+        let searchedTask = i.getElementsByTagName("td")[0].innerText;
+        let searchtextboxval = searchtaskitem.value;
+        let re = new RegExp(searchtextboxval, 'gi');
+        if(searchedTask.match(re)){
+            item.style.display="block"
+        }else{
+            item.style.display="none"
+        }  
+       
+    });     
+});
+    </script>
+
+</body>
+</html>
